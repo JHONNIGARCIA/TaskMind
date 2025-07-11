@@ -7,22 +7,24 @@ document.addEventListener('DOMContentLoaded', function() {
     let isLoginVisible = true;
     
     // Toggle between login and register forms
-    toggleText.addEventListener('click', function(e) {
-        if (e.target.classList.contains('toggle-form')) {
+    document.querySelectorAll('.toggle-form').forEach(btn => {
+        btn.addEventListener('click', function () {
             isLoginVisible = !isLoginVisible;
-            
-            if (isLoginVisible) {
+
+             if (isLoginVisible) {
                 loginForm.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-4');
                 registerForm.classList.add('opacity-0', 'pointer-events-none', 'translate-x-4');
-                toggleText.innerHTML = '¿No tienes una cuenta? <span class="toggle-form text-indigo-600 font-medium">Regístrate aquí</span>';
+                toggleLoginText.classList.remove('hidden');
+                toggleRegisterText.classList.add('hidden');
             } else {
                 loginForm.classList.add('opacity-0', 'pointer-events-none', 'translate-x-4');
                 registerForm.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-4');
-                toggleText.innerHTML = '¿Ya tienes una cuenta? <span class="toggle-form text-indigo-600 font-medium">Inicia sesión aquí</span>';
+                toggleLoginText.classList.add('hidden');
+                toggleRegisterText.classList.remove('hidden');
             }
         }
-    });
-    
+)});
+
     // Login form submission
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
