@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 require_once("../conexion/conexion.php");
 
@@ -9,7 +10,11 @@ if (isset($input['action']) && $input['action'] === 'get_portal_data') {
     // Aquí deberías obtener el usuario autenticado, por ejemplo desde sesión.
     // Para demo, puedes recibir el correo por POST o usar un valor fijo.
     // $correo = $_SESSION['correo'] ?? '';
-    $correo = $input['correo'] ?? ''; // Para pruebas, puedes enviar el correo desde JS
+    $correo = $_SESSION['correo'] ?? '';
+    if (!$correo) {
+        echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+        exit;
+    }
 
     if (!$correo) {
         echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);

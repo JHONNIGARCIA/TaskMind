@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 header('Content-Type: application/json');
 
 require_once("../conexion/conexion.php");
@@ -60,7 +62,10 @@ if (isset($input['action']) && $input['action'] === 'login') {
         $stmt->bind_result($id, $hash, $nombre);
         $stmt->fetch();
         if (password_verify($contrasena, $hash)) {
-            // Aquí podrías iniciar sesión con $_SESSION si lo deseas
+
+            session_regenerate_id(true);     
+            $_SESSION['correo'] = $correo;
+  
             echo json_encode(['success' => true, 'nombre' => $nombre]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Contraseña incorrecta']);
