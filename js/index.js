@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const toggleText = document.getElementById('toggle-text');
@@ -11,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function () {
             isLoginVisible = !isLoginVisible;
 
-             if (isLoginVisible) {
+            if (isLoginVisible) {
                 loginForm.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-4');
                 registerForm.classList.add('opacity-0', 'pointer-events-none', 'translate-x-4');
                 toggleLoginText.classList.remove('hidden');
@@ -22,8 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleLoginText.classList.add('hidden');
                 toggleRegisterText.classList.remove('hidden');
             }
-        }
-)});
+        });
+    });
 
     // Login form submission
     loginForm.addEventListener('submit', function(e) {
@@ -140,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
                     icon: 'success',
                     title: '¡Registro exitoso!',
-                    html: `Bienvenido <strong>${name}</strong> a TaskMind.<br>Tu cuenta ha sido creada correctamente.`,
+                    html: `Bienvenido <strong>${escapeHtml(name)}</strong> a TaskMind.<br>Tu cuenta ha sido creada correctamente.`,
                     showConfirmButton: false,
                     timer: 3000
                 });

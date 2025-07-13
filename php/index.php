@@ -2,19 +2,18 @@
 session_start();
 
 header('Content-Type: application/json');
-
 require_once("../conexion/conexion.php");
 
 // Leer datos JSON
 $input = json_decode(file_get_contents('php://input'), true);
 
 if (isset($input['action']) && $input['action'] === 'register') {
-    $correo = trim($input['correo'] ?? '');
+    $correo = filter_var(trim($input['correo'] ?? ''), FILTER_VALIDATE_EMAIL);
     $contrasena = $input['contrasena'] ?? '';
-    $nombre = trim($input['nombre_completo'] ?? '');
+    $nombre = htmlspecialchars(trim($input['nombre_completo'] ?? ''), ENT_QUOTES, 'UTF-8');
 
     if (!$correo || !$contrasena || !$nombre) {
-        echo json_encode(['success' => false, 'message' => 'Faltan datos']);
+        echo json_encode(['success' => false, 'message' => 'Datos inválidos']);
         exit;
     }
 
@@ -45,11 +44,11 @@ if (isset($input['action']) && $input['action'] === 'register') {
 
 // Manejo de login
 if (isset($input['action']) && $input['action'] === 'login') {
-    $correo = trim($input['correo'] ?? '');
+    $correo = filter_var(trim($input['correo'] ?? ''), FILTER_VALIDATE_EMAIL);
     $contrasena = $input['contrasena'] ?? '';
 
     if (!$correo || !$contrasena) {
-        echo json_encode(['success' => false, 'message' => 'Faltan datos']);
+        echo json_encode(['success' => false, 'message' => 'Datos inválidos']);
         exit;
     }
 
