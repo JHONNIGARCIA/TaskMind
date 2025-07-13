@@ -10,16 +10,12 @@ if (isset($input['action']) && $input['action'] === 'get_portal_data') {
     // Aquí deberías obtener el usuario autenticado, por ejemplo desde sesión.
     // Para demo, puedes recibir el correo por POST o usar un valor fijo.
     // $correo = $_SESSION['correo'] ?? '';
-    $correo = $_SESSION['correo'] ?? '';
-    if (!$correo) {
-        echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+    
+    if (!isset($_SESSION['correo'])) {
+        echo json_encode(['success' => false, 'message' => 'Sesión no iniciada']);
         exit;
     }
-
-    if (!$correo) {
-        echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
-        exit;
-    }
+    $correo = $_SESSION['correo'];
 
     // Obtener datos del usuario
     $stmt = $conn->prepare("SELECT id, correo, nombre_completo, semestre, foto_perfil FROM usuarios WHERE correo = ?");

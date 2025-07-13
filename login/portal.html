@@ -93,6 +93,8 @@
                             Calendario
                         </a>
                     </li>
+                    <li>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -191,6 +193,16 @@
             </div>
         </div>
     </div>
+
+    <script>
+    fetch('../php/session.php')
+        .then(res => res.json())
+        .then(data => {
+            if (!data.authenticated) {
+                window.location.href = '../login/index.html';
+            }
+        });
+    </script>
 
     <!-- JavaScript -->
     <script src="../js/portal.js"></script>

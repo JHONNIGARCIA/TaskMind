@@ -533,5 +533,16 @@
         // Inicializar
         init();
     </script>
+
+    <script>
+    fetch('../php/session.php')
+        .then(res => res.json())
+        .then(data => {
+            if (!data.authenticated) {
+                window.location.href = '../login/index.html'; 
+            }
+        });
+    </script>
+
 </body>
 </html>

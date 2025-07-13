@@ -616,10 +616,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-function logout() {
-    fetch('../php/logout.php', { method: 'POST' })
-        .then(() => {
-            window.location.href = 'index.html';
-        });
-}
