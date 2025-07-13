@@ -1,15 +1,12 @@
 <?php
 session_start();
-header('Content-Type: application/json');
 require_once("../conexion/conexion.php");
+header('Content-Type: application/json');
 
 // Leer datos JSON
 $input = json_decode(file_get_contents('php://input'), true);
 
 if (isset($input['action']) && $input['action'] === 'get_portal_data') {
-    // Aquí deberías obtener el usuario autenticado, por ejemplo desde sesión.
-    // Para demo, puedes recibir el correo por POST o usar un valor fijo.
-    // $correo = $_SESSION['correo'] ?? '';
     
     if (!isset($_SESSION['correo'])) {
         echo json_encode(['success' => false, 'message' => 'Sesión no iniciada']);

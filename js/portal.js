@@ -599,20 +599,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Cerrar sesión
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-        Swal.fire({
-            title: '¿Cerrar sesión?',
-            text: "Estás a punto de cerrar sesión en tu cuenta.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, cerrar sesión',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                localStorage.removeItem('correo');
-                window.location.href = 'index.html';
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        fetch('php/logout.php', {
+            method: 'POST',
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Sesión cerrada correctamente');
+                window.location.replace('login/portal.html'); // evita volver atrás
+            } else {
+                alert('Error al cerrar sesión');
             }
-        });
+        })
+        .catch(() => alert('Error de conexión'));
     });
 });
