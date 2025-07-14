@@ -182,33 +182,40 @@ if (isset($input['action']) && $input['action'] === 'update_perfil') {
     exit;
 }
 
-// Subir foto de perfil
+// Subir foto de perfil directamente a la base de datos como BLOB
 if (isset($_POST['action']) && $_POST['action'] === 'update_foto_perfil') {
     $correo = $_POST['correo'] ?? '';
+
     if (!$correo || !isset($_FILES['foto_perfil'])) {
         echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
         exit;
     }
+
     $file = $_FILES['foto_perfil'];
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
     if (!in_array($ext, $allowed)) {
         echo json_encode(['success' => false, 'message' => 'Formato de imagen no permitido']);
         exit;
     }
-    $filename = uniqid('perfil_') . '.' . $ext;
-    $ruta = '../uploads/' . $filename;
-    if (!is_dir('../uploads')) mkdir('../uploads', 0777, true);
-    if (move_uploaded_file($file['tmp_name'], $ruta)) {
-        $ruta_db = 'uploads/' . $filename;
-        $stmt = $conn->prepare("UPDATE usuarios SET foto_perfil = ? WHERE correo = ?");
-        $stmt->bind_param("ss", $ruta_db, $correo);
-        $success = $stmt->execute();
-        $stmt->close();
-        echo json_encode(['success' => $success, 'foto_perfil' => $ruta_db]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'No se pudo guardar la imagen']);
+
+    // Leer el contenido binario del archivo
+    $image_data = file_get_contents($file['tmp_name']);
+    if ($image_data === false) {
+        echo json_encode(['success' => false, 'message' => 'No se pudo leer la imagen']);
+        exit;
     }
+
+    // Actualizar la imagen en la base de datos como BLOB
+    $stmt = $conn->prepare("UPDATE usuarios SET foto_perfil = ? WHERE correo = ?");
+    $null = NULL;
+    $stmt->bind_param("bs", $null, $correo);
+    $stmt->send_long_data(0, $image_data);
+    $success = $stmt->execute();
+    $stmt->close();
+
+    echo json_encode(['success' => $success]);
     exit;
 }
 
