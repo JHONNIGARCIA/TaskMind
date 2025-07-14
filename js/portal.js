@@ -600,19 +600,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        fetch('php/logout.php', {
-            method: 'POST',
-            credentials: 'include'
-        })
-        .then(response => response.json())
+        fetch('../php/portal.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'logout' })
+        }).then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert('Sesión cerrada correctamente');
-                window.location.replace('login/portal.html'); // evita volver atrás
+            window.location.href = '../login/index.html';
             } else {
-                alert('Error al cerrar sesión');
+            alert('Error al cerrar sesión');
             }
-        })
-        .catch(() => alert('Error de conexión'));
+        });
     });
 });

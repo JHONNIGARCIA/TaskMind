@@ -1,5 +1,16 @@
 <?php
 session_start();
+
+$input = json_decode(file_get_contents('php://input'), true);
+
+// Logout
+if (isset($input['action']) && $input['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    echo json_encode(['success' => true, 'message' => 'Sesión cerrada']);
+    exit;
+}
+
 require_once("../conexion/conexion.php");
 header('Content-Type: application/json');
 
