@@ -615,4 +615,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: '¿Estás seguro de que deseas salir?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Borrar localStorage (si usas para el login)
+            localStorage.clear();
+
+            // Opcional: hacer una petición al servidor para destruir la sesión
+            // location.href = '../logout.php'; (si tuvieras logout.php)
+            
+            // Redirigir y bloquear volver con back
+            window.location.replace("index.html");
+        }
+    });
+});
+
 });
