@@ -2,10 +2,12 @@
 header('Content-Type: application/json');
 
 require_once("../conexion/conexion.php");
+require_once("logger.php");
 
 // Leer datos JSON
 $input = json_decode(file_get_contents('php://input'), true);
 
+// REGISTRO
 if (isset($input['action']) && $input['action'] === 'register') {
     $correo = trim($input['correo'] ?? '');
     $contrasena = $input['contrasena'] ?? '';
@@ -22,7 +24,7 @@ if (isset($input['action']) && $input['action'] === 'register') {
         exit;
     }
 
-    // Verificar con Google
+    // Verificar reCAPTCHA con Google
     $secretKey = "6LfH0oUrAAAAAInVIvLgrmxYB8jGM6UjI5YTJQEh";
     $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret={$secretKey}&response={$recaptcha}");
     $responseKeys = json_decode($response, true);
@@ -32,13 +34,14 @@ if (isset($input['action']) && $input['action'] === 'register') {
         exit;
     }
 
-    // Verificar si el correo ya existe
+    // Verificar si ya existe el correo
     $stmt = $conn->prepare("SELECT id FROM usuarios WHERE correo = ?");
     $stmt->bind_param("s", $correo);
     $stmt->execute();
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
         echo json_encode(['success' => false, 'message' => 'El correo ya está registrado']);
+        registrar_log($conn, $correo, 'Intento fallido de registro: correo ya registrado'); // 🔒
         $stmt->close();
         exit;
     }
@@ -50,6 +53,7 @@ if (isset($input['action']) && $input['action'] === 'register') {
     $stmt->bind_param("sss", $correo, $hash, $nombre);
     if ($stmt->execute()) {
         echo json_encode(['success' => true]);
+        registrar_log($conn, $correo, 'Registro exitoso de usuario'); // 🔒
     } else {
         echo json_encode(['success' => false, 'message' => 'Error al registrar usuario']);
     }
@@ -57,7 +61,7 @@ if (isset($input['action']) && $input['action'] === 'register') {
     exit;
 }
 
-// Manejo de login
+// LOGIN
 if (isset($input['action']) && $input['action'] === 'login') {
     $correo = trim($input['correo'] ?? '');
     $contrasena = $input['contrasena'] ?? '';
@@ -76,19 +80,21 @@ if (isset($input['action']) && $input['action'] === 'login') {
         $stmt->bind_result($id, $hash, $nombre);
         $stmt->fetch();
         if (password_verify($contrasena, $hash)) {
-            // Aquí podrías iniciar sesión con $_SESSION si lo deseas
             echo json_encode(['success' => true, 'nombre' => $nombre]);
+            registrar_log($conn, $correo, 'Inicio de sesión exitoso'); // 🔒
         } else {
             echo json_encode(['success' => false, 'message' => 'Contraseña incorrecta']);
+            registrar_log($conn, $correo, 'Intento de inicio de sesión con contraseña incorrecta'); // 🔒
         }
     } else {
         echo json_encode(['success' => false, 'message' => 'Usuario no encontrado']);
+        registrar_log($conn, $correo, 'Intento de inicio de sesión con usuario no registrado'); // 🔒
     }
     $stmt->close();
     exit;
 }
 
-// Si no es una acción válida
+// ACCIÓN NO VÁLIDA
 echo json_encode(['success' => false, 'message' => 'Acción no válida']);
 $conn->close();
 ?>
