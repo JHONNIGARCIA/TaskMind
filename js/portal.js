@@ -557,9 +557,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         <label class="block text-sm font-medium text-gray-700 mb-1">Semestre</label>
                         <input id="edit-semestre" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="${semestre}">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Foto de perfil (URL)</label>
-                        <input id="edit-foto" class="w-full px-3 py-2 border border-gray-300 rounded-md" value="">
+                    <div class="mb-4">
+                        <label for="edit-foto" class="block text-sm font-medium text-gray-700 mb-2">Foto de perfil</label>
+                        <input type="file" id="edit-foto" accept="image/*"
+                                class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+                        
+                        <!-- Vista previa -->
+                        <div id="preview-container" class="mt-3 hidden">
+                            <p class="text-sm text-gray-500 mb-1">Vista previa:</p>
+                            <img id="preview-image" class="w-32 h-32 object-cover rounded-full border border-gray-300 shadow" />
+                        </div>
                     </div>
                 </div>
             `,
@@ -625,13 +632,8 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Borrar localStorage (si usas para el login)
             localStorage.clear();
 
-            // Opcional: hacer una petición al servidor para destruir la sesión
-            // location.href = '../logout.php'; (si tuvieras logout.php)
-            
-            // Redirigir y bloquear volver con back
             window.location.replace("index.html");
         }
     });
