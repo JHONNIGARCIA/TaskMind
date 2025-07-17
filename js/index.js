@@ -1,17 +1,17 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const toggleText = document.getElementById('toggle-text');
     const formsContainer = document.getElementById('forms-container');
-    
+
     let isLoginVisible = true;
-    
-    // Toggle between login and register forms
+
+    // Cambiar entre login y registro
     document.querySelectorAll('.toggle-form').forEach(btn => {
         btn.addEventListener('click', function () {
             isLoginVisible = !isLoginVisible;
 
-             if (isLoginVisible) {
+            if (isLoginVisible) {
                 loginForm.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-4');
                 registerForm.classList.add('opacity-0', 'pointer-events-none', 'translate-x-4');
                 toggleLoginText.classList.remove('hidden');
@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleLoginText.classList.add('hidden');
                 toggleRegisterText.classList.remove('hidden');
             }
-        }
-)});
+        });
+    });
 
-    // Login form submission
-    loginForm.addEventListener('submit', function(e) {
+    // FORMULARIO DE LOGIN
+    loginForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
         const email = document.getElementById('login-email').value;
@@ -41,33 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-                // Verificar reCAPTCHA
-        const recaptchaToken = grecaptcha.getResponse();
-        if (!recaptchaToken) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Completa el reCAPTCHA',
-                text: 'Por favor verifica que no eres un robot',
-            });
-            return;
-        }
-
-        // Enviar datos al backend PHP con el token
-        fetch('../php/index.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action: 'register',
-                correo: email,
-                contrasena: password,
-                nombre_completo: name,
-                recaptcha: recaptchaToken
-            })
-        })
-
-        // Enviar datos al backend PHP
         fetch('../php/index.php', {
             method: 'POST',
             headers: {
@@ -79,45 +52,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 contrasena: password
             })
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Inicio de sesión exitoso',
-                    text: 'Redirigiendo a tu agenda...',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                setTimeout(() => {
-                    localStorage.setItem('correo', email);
-                    window.location.href = 'portal.html';
-                }, 1500);
-            } else {
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Inicio de sesión exitoso',
+                        text: 'Redirigiendo a tu agenda...',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    setTimeout(() => {
+                        localStorage.setItem('correo', email);
+                        window.location.href = 'portal.html';
+                    }, 1500);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Credenciales incorrectas',
+                    });
+                }
+            })
+            .catch(() => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: data.message || 'Credenciales incorrectas',
+                    text: 'Error de conexión con el servidor',
                 });
-            }
-        })
-        .catch(() => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error de conexión con el servidor',
             });
-        });
     });
-    
-    // Register form submission
-    registerForm.addEventListener('submit', function(e) {
+
+        // FORMULARIO DE REGISTRO
+        registerForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const name = document.getElementById('reg-name').value;
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
         const confirmPass = document.getElementById('reg-confirm').value;
+        const recaptchaToken = grecaptcha.getResponse(); // ✅ Importante
 
         // Validaciones
         if (!name || !email || !password || !confirmPass) {
@@ -147,7 +121,17 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Enviar datos al backend PHP
+        // ✅ Validar token de reCAPTCHA
+        if (!recaptchaToken) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Verifica el reCAPTCHA',
+                text: 'Por favor confirma que no eres un robot.',
+            });
+            return;
+        }
+
+        // ✅ Enviar datos al backend con el token incluido
         fetch('../php/index.php', {
             method: 'POST',
             headers: {
@@ -157,7 +141,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 action: 'register',
                 correo: email,
                 contrasena: password,
-                nombre_completo: name
+                nombre_completo: name,
+                recaptcha: recaptchaToken // ✅ Aquí se envía
             })
         })
         .then(res => res.json())
@@ -171,10 +156,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     timer: 3000
                 });
                 setTimeout(() => {
-                    isLoginVisible = true;
+                    grecaptcha.reset(); // ✅ Reinicia el captcha
                     loginForm.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-4');
                     registerForm.classList.add('opacity-0', 'pointer-events-none', 'translate-x-4');
-                    toggleText.innerHTML = '¿No tienes una cuenta? <span class="toggle-form text-indigo-600 font-medium">Regístrate aquí</span>';
                     registerForm.reset();
                 }, 3000);
             } else {
