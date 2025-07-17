@@ -16,6 +16,22 @@ if (isset($input['action']) && $input['action'] === 'register') {
         exit;
     }
 
+    $recaptcha = $input['recaptcha'] ?? '';
+    if (!$recaptcha) {
+        echo json_encode(['success' => false, 'message' => 'Captcha no enviado']);
+        exit;
+    }
+
+    // Verificar con Google
+    $secretKey = "6LfH0oUrAAAAAInVIvLgrmxYB8jGM6UjI5YTJQEh";
+    $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret={$secretKey}&response={$recaptcha}");
+    $responseKeys = json_decode($response, true);
+
+    if (!$responseKeys["success"]) {
+        echo json_encode(['success' => false, 'message' => 'Captcha inválido']);
+        exit;
+    }
+
     // Verificar si el correo ya existe
     $stmt = $conn->prepare("SELECT id FROM usuarios WHERE correo = ?");
     $stmt->bind_param("s", $correo);

@@ -41,6 +41,32 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+                // Verificar reCAPTCHA
+        const recaptchaToken = grecaptcha.getResponse();
+        if (!recaptchaToken) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Completa el reCAPTCHA',
+                text: 'Por favor verifica que no eres un robot',
+            });
+            return;
+        }
+
+        // Enviar datos al backend PHP con el token
+        fetch('../php/index.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'register',
+                correo: email,
+                contrasena: password,
+                nombre_completo: name,
+                recaptcha: recaptchaToken
+            })
+        })
+
         // Enviar datos al backend PHP
         fetch('../php/index.php', {
             method: 'POST',
